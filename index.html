@@ -16,7 +16,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; transition: background-color .35s ease, color .35s ease; }
 
     @keyframes fadeInUp {
       0% { opacity: 0; transform: translateY(30px); }
@@ -31,11 +31,8 @@
       0% { opacity: 0; transform: scale(0.9); }
       100% { opacity: 1; transform: scale(1); }
     }
-    .profile-img {
-      animation: fadeInScale 1s ease forwards;
-    }
+    .profile-img { animation: fadeInScale 1s ease forwards; }
 
-    /* Subtle hover animation for cards */
     .card-hover {
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
@@ -43,23 +40,43 @@
       transform: translateY(-4px);
       box-shadow: 0 8px 20px rgba(99,102,241,0.25);
     }
+
+    /* Typing cursor (keeps CSS tiny) */
+    .typing-cursor { border-right: 2px solid; padding-right: .35rem; margin-left: .35rem; }
+
+    /* Light-mode helper (non-invasive) */
+    .light-mode { background-color: #f8fafc !important; color: #0f172a !important; }
+    .light-mode .bg-gray-900 { background-color: #ffffff !important; }
+    .light-mode .bg-gray-800 { background-color: #f1f5f9 !important; }
+    .light-mode .text-gray-100 { color: #0f172a !important; }
+    .light-mode .text-gray-300, .light-mode .text-gray-400 { color: #334155 !important; }
+    .light-mode .border-gray-700 { border-color: #e2e8f0 !important; }
+    /* Theme button minimal style to avoid changing UI look drastically */
+    #theme-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.08); padding: 6px 8px; border-radius: 8px; color: inherit; }
+    #theme-toggle:hover { border-color: rgba(99,102,241,0.6); cursor: pointer; }
   </style>
 </head>
 
-<body class="bg-gray-900 text-gray-100 font-sans antialiased">
+<body class="bg-gray-900 text-gray-100 font-sans antialiased transition-colors duration-300">
 
   <!-- ===== HEADER ===== -->
   <header class="max-w-5xl mx-auto px-6 py-10 fade-in" style="animation-delay: 0.1s">
     <nav class="flex items-center justify-between flex-wrap gap-4">
       <div>
         <h1 class="text-2xl font-semibold">Aryaman Mohanty</h1>
-        <p class="text-sm text-gray-400">Salesforce Developer • Apex • LWC • AI Integrations</p>
+        <!-- original description preserved; we only add a small span for typing after it -->
+        <p class="text-sm text-gray-400">
+          Salesforce Developer • Apex • LWC • AI Integrations
+          <span id="typing-span" class="typing-cursor" aria-hidden="true"></span>
+        </p>
       </div>
       <div class="space-x-4 text-sm text-gray-300">
         <a href="#projects" class="hover:text-indigo-400">Projects</a>
         <a href="#experience" class="hover:text-indigo-400">Experience</a>
         <a href="#skills" class="hover:text-indigo-400">Skills</a>
         <a href="#contact" class="hover:text-indigo-400">Contact</a>
+        <!-- theme button added non-invasively -->
+        <button id="theme-toggle" aria-label="Toggle theme" title="Toggle dark / light">🌙</button>
       </div>
     </nav>
   </header>
@@ -256,22 +273,94 @@
 
   </main>
 
-  <!-- ===== Animation Trigger Script ===== -->
+  <!-- ===== Animation Trigger Script & features (optimized) ===== -->
   <script>
-    const fadeElements = document.querySelectorAll('.fade-in');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.animationPlayState = 'running';
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    fadeElements.forEach(el => {
-      el.style.animationPlayState = 'paused';
-      observer.observe(el);
-    });
-  </script>
+  (function () {
+    // Minimal DOM lookups cached
+    const fadeEls = document.querySelectorAll('.fade-in');
+    const typingSpan = document.getElementById('typing-span');
+    const themeBtn = document.getElementById('theme-toggle');
+    const body = document.body;
 
+    // 1) Fade-in observer (unchanged behavior, efficient)
+    if (fadeEls.length) {
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.style.animationPlayState = 'running';
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      fadeEls.forEach(el => { el.style.animationPlayState = 'paused'; io.observe(el); });
+    }
+
+    // 2) Typing/erasing loop using requestAnimationFrame for smoothness & low overhead
+    const roles = ["Salesforce Developer", "Apex Specialist", "LWC Builder", "AI Integrator", "Automation Enthusiast"];
+    let roleIndex = 0, charIndex = 0, direction = 1; // direction: 1 typing, -1 erasing
+    let lastTick = 0;
+    const TYPING_SPEED = 45;    // ms per char typed (smaller = faster)
+    const PAUSE_AFTER = 900;    // ms pause after typing full word
+    let pauseUntil = 0;
+
+    function typingLoop(timestamp) {
+      if (!typingSpan) return;
+      if (!lastTick) lastTick = timestamp;
+      const elapsed = timestamp - lastTick;
+      if (pauseUntil > timestamp) {
+        requestAnimationFrame(typingLoop);
+        return;
+      }
+      if (elapsed >= TYPING_SPEED) {
+        lastTick = timestamp;
+        const current = roles[roleIndex];
+        charIndex += direction;
+        // clamp
+        if (charIndex >= current.length) {
+          charIndex = current.length;
+          direction = -1;
+          pauseUntil = timestamp + PAUSE_AFTER;
+        } else if (charIndex <= 0) {
+          charIndex = 0;
+          direction = 1;
+          roleIndex = (roleIndex + 1) % roles.length;
+          pauseUntil = timestamp + 200; // short pause before typing next
+        }
+        typingSpan.textContent = current.slice(0, charIndex);
+      }
+      requestAnimationFrame(typingLoop);
+    }
+
+    // start only after DOM fully loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(typingLoop));
+    } else {
+      requestAnimationFrame(typingLoop);
+    }
+
+    // 3) Theme toggle (optimized & respects system preference)
+    const stored = localStorage.getItem('theme'); // 'light' or 'dark' or null
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    if (stored === 'light' || (!stored && prefersLight)) {
+      body.classList.add('light-mode');
+      if (themeBtn) themeBtn.textContent = '☀️';
+    } else {
+      if (themeBtn) themeBtn.textContent = '🌙';
+    }
+
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isLight = body.classList.toggle('light-mode');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        themeBtn.textContent = isLight ? '☀️' : '🌙';
+      });
+    }
+
+    // small graceful fallback if typing-span wasn't present
+    if (!typingSpan && console && console.warn) {
+      // nothing critical — just informational
+    }
+  })();
+  </script>
 </body>
 </html>
