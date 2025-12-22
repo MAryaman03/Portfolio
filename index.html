@@ -1,354 +1,754 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aryaman Mohanty Portfolio</title>
-  <meta name="description" content="Portfolio of Aryaman Mohanty — Salesforce Developer skilled in Apex, LWC, Flow Builder, and AI integrations. Explore Salesforce projects, AI assistants, and automation tools." />
-
-  <!-- Open Graph / Social Preview -->
+  <meta name="description" content="Portfolio of Aryaman Mohanty — Salesforce Developer skilled in Apex, LWC, Flow Builder, and AI integrations. Explore Salesforce projects, AI assistants, and automation tools."/>
   <meta property="og:title" content="Aryaman Mohanty | Salesforce Developer & AI Integrator">
   <meta property="og:description" content="Explore Aryaman’s Salesforce projects, Apex, LWC, and AI integrations portfolio.">
   <meta property="og:image" content="images/profile.jpg">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://yourdomain.com">
-
+  <link rel="icon" href="images/favicon.ico">
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- 3D tilt effect -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <style>
-    html { scroll-behavior: smooth; transition: background-color .35s ease, color .35s ease; }
+    /* ===================== THEME TOKENS ===================== */
+    :root{
+      --tech-green:#22c55e; --teal:#14b8a6; --cyan:#22d3ee; --violet:#8b5cf6;
+      --bg-base:#0a0f0a; --bg-layer:rgba(21,31,21,0.75);
+      --text-base:#e5e7eb; --text-dim:#9ca3af;
+      --card:#111827; --card-2:#1f2937; --border:rgba(255,255,255,.08);
+      --particle-color-dark: rgba(20,184,166,0.28);
+      --particle-color-light: rgba(15,23,42,0.18);
+      --trail-rgb: 20,184,166; --grid-line: rgba(34,197,94,0.1); --grid-dot: rgba(34,197,94,0.14);
+      --grad-1: var(--teal); --grad-2: var(--cyan); --grad-3: var(--violet);
+    }
+    .light-mode{
+      --bg-base:#f8faf9; --bg-layer:#ffffff; --text-base:#0f172a; --text-dim:#334155;
+      --card:#ffffff; --card-2:#eef2f7; --border:#e2e8f0;
+      --particle-color-dark: var(--particle-color-light);
+      --trail-rgb: 15,23,42; --grid-line: rgba(15,23,42,0.08); --grid-dot: rgba(15,23,42,0.12);
+    }
 
-    @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
-    .fade-in { opacity: 0; animation: fadeInUp 0.8s ease-out forwards; }
+    html{ scroll-behavior:smooth; }
+    body{ background:var(--bg-base); color:var(--text-base); transition:background-color .35s,color .35s; position:relative; overflow-x:hidden; min-height:100vh; font-synthesis-weight:none; text-rendering:optimizeLegibility; }
 
-    @keyframes fadeInScale { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-    .profile-img { animation: fadeInScale 1s ease forwards; }
+    body::before{
+      content:""; position:fixed; inset:-20vmax; z-index:-4; pointer-events:none;
+      background:
+        radial-gradient(60vmax 60vmax at 12% 18%, rgba(20,184,166,0.12), transparent 55%),
+        radial-gradient(70vmax 70vmax at 86% 12%, rgba(34,211,238,0.10), transparent 60%),
+        radial-gradient(80vmax 80vmax at 50% 100%, rgba(99,102,241,0.10), transparent 60%);
+      filter:saturate(1.05) brightness(0.95);
+    }
+    .light-mode::before{ filter:saturate(1.1) brightness(1.08); }
 
-    .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(99,102,241,0.25); }
+    .tech-grid{
+      position:fixed; inset:0; z-index:-3; pointer-events:none;
+      background:
+        radial-gradient(circle at 25% 25%, var(--grid-dot) 1px, transparent 1px) 0 0/32px 32px,
+        radial-gradient(circle at 75% 75%, var(--grid-dot) 1px, transparent 1px) 0 0/32px 32px,
+        linear-gradient(0deg, var(--grid-line) 1px, transparent 1px) 0 0/32px 32px,
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0/32px 32px;
+      mask: radial-gradient(100% 60% at 50% 40%, rgba(0,0,0,.7), rgba(0,0,0,0.1));
+    }
 
-    .typing-cursor { border-right: 2px solid; padding-right: .35rem; margin-left: .35rem; }
+    #particle-canvas,#cursor-canvas{ position:fixed; inset:0; pointer-events:none; }
+    #particle-canvas{ z-index:-2; } #cursor-canvas{ z-index:-1; }
 
-    .light-mode { background-color: #f8fafc !important; color: #0f172a !important; }
-    .light-mode .bg-gray-900 { background-color: #ffffff !important; }
-    .light-mode .bg-gray-800 { background-color: #f1f5f9 !important; }
-    .light-mode .text-gray-100 { color: #0f172a !important; }
-    .light-mode .text-gray-300, .light-mode .text-gray-400 { color: #334155 !important; }
-    .light-mode .border-gray-700 { border-color: #e2e8f0 !important; }
+    .card{ background:linear-gradient(180deg,var(--card),var(--card-2)); border:1px solid var(--border); border-radius:.75rem; }
+    .card-hover{ transition:transform .2s, box-shadow .2s, border-color .2s; background:linear-gradient(180deg,var(--card),var(--card-2)); border:1px solid var(--border); border-radius:.75rem; }
+    .card-hover:hover{ transform:translateY(-3px); box-shadow:0 10px 24px rgba(20,184,166,.28); border-color:rgba(20,184,166,.45); }
 
-    #theme-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.08); padding: 6px 8px; border-radius: 8px; color: inherit; }
-    #theme-toggle:hover { border-color: rgba(99,102,241,0.6); cursor: pointer; }
+    .grad-text{ background:linear-gradient(90deg,var(--grad-1),var(--grad-2),var(--grad-3),var(--grad-1)); background-size:300% 300%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:hueShift 6s ease infinite; }
+    @keyframes hueShift{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
-    /* Particle canvas */
-    #particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+    .neon-btn{ box-shadow:0 0 0 rgba(20,184,166,0); transition: box-shadow .18s, transform .08s, border-color .2s; border:1px solid transparent; }
+    .neon-btn:hover{ box-shadow:0 0 14px rgba(20,184,166,.55); transform: translateY(-1px); border-color: rgba(20,184,166,.5); }
+
+    .gradient-border{ position:relative; border-radius:.75rem; overflow:hidden; }
+    .gradient-border::before{ content:""; position:absolute; inset:-2px; background: conic-gradient(from 0deg, var(--grad-1), var(--grad-2), var(--grad-3), var(--grad-1)); filter: blur(6px); z-index:0; animation:spin 6s linear infinite; }
+    .gradient-border>*{ position:relative; z-index:1; }
+    @keyframes spin{ to{ transform: rotate(360deg) } }
+
+    .float-icons{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    .float-icons span{ position:absolute; font-size:22px; opacity:.18; color:var(--text-dim); animation:drift 14s linear infinite; }
+    @keyframes drift{ from{ transform:translateY(110vh) translateX(0)} to{ transform:translateY(-10vh) translateX(40px)} }
+
+    @keyframes fadeInUp{0%{opacity:0; transform:translateY(18px)}100%{opacity:1; transform:translateY(0)}}
+    .fade-in{opacity:0; animation:fadeInUp .6s ease-out forwards;}
+    @keyframes fadeInScale{0%{opacity:0; transform:scale(.96)}100%{opacity:1; transform:scale(1)}}
+    .profile-img{animation:fadeInScale .7s ease forwards;}
+    .animate-title{position:relative; opacity:0; transform:translateY(16px); animation:fadeTitle .7s ease forwards .15s;}
+    @keyframes fadeTitle{to{opacity:1; transform:translateY(0)}}
+    .shine{position:absolute; top:0; left:-150%; width:120%; height:100%;
+      background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.28) 50%,transparent 70%); animation:shimmer 3.6s infinite linear .4s;}
+    @keyframes shimmer{0%{left:-150%}100%{left:150%}}
+    .animate-paragraph{opacity:0; transform:translateY(12px); animation:fadeInText .6s ease forwards .6s;}
+    @keyframes fadeInText{to{opacity:1; transform:translateY(0)}}
+    .animate-buttons{opacity:0; transform:translateY(10px); animation:fadeInButtons .5s ease forwards .9s;}
+    @keyframes fadeInButtons{to{opacity:1; transform:translateY(0)}}
+    .typing-cursor{ border-right:2px solid; padding-right:.35rem; margin-left:.35rem; }
+    .subtitle-fixed{ min-height:1.5rem; line-height:1.5rem; white-space:nowrap; overflow:hidden; }
+
+    .scroll-top{ position:fixed; bottom:22px; right:22px; width:44px; height:44px; display:grid; place-items:center; background: var(--teal); color:#052e2a; border-radius:9999px; cursor:pointer; border:1px solid rgba(255,255,255,.12); box-shadow:0 8px 24px rgba(20,184,166,.40); opacity:0; transform:translateY(10px); transition:opacity .2s, transform .2s; }
+    .scroll-top.show{opacity:1; transform:translateY(0);}
+
+    .skill-tag{ position:relative; border:1px solid var(--border); background:#0b1a17; color:var(--text-base); border-radius:.5rem; padding:.25rem .5rem; font-size:.75rem; overflow:hidden; isolation:isolate; animation: tagPulse 2.6s ease-in-out infinite; }
+    .light-mode .skill-tag{ background:#effcf9; }
+    .skill-tag::after{ content:""; position:absolute; inset:-2px; z-index:-1; border-radius:.6rem; background: radial-gradient(120px 40px at 20% 50%, rgba(20,184,166,.35), transparent 60%), radial-gradient(120px 40px at 80% 50%, rgba(34,211,238,.35), transparent 60%); filter: blur(8px); opacity:.0; transition:opacity .25s; }
+    .skill-tag:hover::after{ opacity:.35; }
+    @keyframes tagPulse{ 0%,100%{ box-shadow:0 0 0 rgba(20,184,166,0) } 50%{ box-shadow:0 0 18px rgba(20,184,166,.28) } }
+
+    .float-card{ animation: floatY 5.5s ease-in-out infinite; will-change: transform; }
+    .float-card:nth-child(2){ animation-duration:6.2s; animation-delay:.4s;}
+    .float-card:nth-child(3){ animation-duration:5.9s; animation-delay:.8s;}
+    @keyframes floatY{ 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-6px) } }
+
+    .project-card{ position:relative; overflow:hidden; cursor:pointer; }
+    .project-card::after{ content:""; position:absolute; inset:0 0 0 -120%; background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.12) 45%, transparent 60%); transform: skewX(-15deg); transition: transform .6s ease, left .6s ease; pointer-events:none; }
+    .project-card:hover::after{ left: 120%; }
+    .project-card:hover{ box-shadow:0 12px 28px rgba(34,211,238,.18), 0 0 0 1px rgba(20,184,166,.25) inset; transform: translateY(-4px); }
+
+    .chat-fab{ position:fixed; bottom:22px; left:22px; width:48px; height:48px; border-radius:9999px; background:linear-gradient(135deg, var(--teal), var(--cyan)); color:#fff; display:grid; place-items:center; box-shadow:0 8px 24px rgba(14,165,233,.45); cursor:pointer; border:1px solid rgba(255,255,255,.12); }
+    .chat-panel{ position:fixed; bottom:78px; left:22px; width:320px; max-width:calc(100vw - 44px); background: var(--card); color: var(--text-base); border:1px solid var(--border); border-radius:12px; padding:14px; display:none; box-shadow:0 20px 40px rgba(2,6,23,.6); }
+
+    .toast{ position:fixed; bottom:22px; left:50%; transform: translateX(-50%) translateY(10px); background:#10b981; color:white; padding:10px 14px; border-radius:10px; box-shadow:0 10px 24px rgba(16,185,129,.45); opacity:0; transition:opacity .18s, transform .18s; }
+    .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+    #main-nav .nav-link.active{ color: var(--teal) !important; }
+
+    /* ===== Modals ===== */
+    .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:9999; }
+    .modal-content{ background:var(--card); color:var(--text-base); border-radius:12px; padding:24px; width:90%; max-width:680px; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,.45); animation:fadeInScale .25s ease; }
+    .modal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .modal-close{ cursor:pointer; font-size:1.1rem; opacity:.75; }
+    .modal iframe{ width:100%; height:520px; border-radius:10px; }
+    .loading-spinner{ border:3px solid var(--border); border-top:3px solid var(--teal); border-radius:50%; width:18px; height:18px; animation:spin 1s linear infinite; }
+    @keyframes spin{ to{ transform:rotate(360deg) } }
+
+    /* Timeline accent */
+    .timeline{ position:relative; }
+    .timeline::before{ content:""; position:absolute; left:12px; top:0; bottom:0; width:2px; background:linear-gradient(var(--teal), transparent); opacity:.65; }
+    .timeline-item{ position:relative; padding-left:2.5rem; }
+    .timeline-item .timeline-bullet{ position:absolute; left:.68rem; top:.6rem; width:10px; height:10px; background:var(--teal); border-radius:9999px; box-shadow:0 0 12px rgba(20,184,166,.8) }
   </style>
 </head>
 
-<body class="bg-gray-900 text-gray-100 font-sans antialiased transition-colors duration-300">
+<body class="font-sans antialiased">
+  <!-- Background layers -->
+  <div class="tech-grid" aria-hidden="true"></div>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+  <canvas id="cursor-canvas" aria-hidden="true"></canvas>
 
-  <canvas id="particle-canvas"></canvas>
+  <!-- Floating tech icons in hero -->
+  <div class="float-icons" aria-hidden="true">
+    <span style="left:10%; animation-delay:0s">⚡</span>
+    <span style="left:30%; animation-delay:3s">☁️</span>
+    <span style="left:55%; animation-delay:6s">🐍</span>
+    <span style="left:70%; animation-delay:1s">🧩</span>
+    <span style="left:85%; animation-delay:5s">🧠</span>
+    <span style="left:20%; animation-delay:8s">💻</span>
+  </div>
 
   <!-- ===== HEADER ===== -->
-  <header class="max-w-5xl mx-auto px-6 py-10 fade-in" style="animation-delay: 0.1s">
+  <header class="max-w-5xl mx-auto px-6 py-10 fade-in" data-animate style="animation-delay:.05s">
     <nav class="flex items-center justify-between flex-wrap gap-4">
       <div>
-        <h1 class="text-2xl font-semibold">Aryaman Mohanty</h1>
-        <p class="text-sm text-gray-400">
+        <h1 class="text-2xl font-semibold grad-text">Aryaman Mohanty</h1>
+        <p class="text-sm" style="color:var(--text-dim)">
           Salesforce Developer • Apex • LWC • AI Integrations
           <span id="typing-span" class="typing-cursor" aria-hidden="true"></span>
         </p>
       </div>
-      <div class="space-x-4 text-sm text-gray-300">
-        <a href="#projects" class="hover:text-indigo-400">Projects</a>
-        <a href="#experience" class="hover:text-indigo-400">Experience</a>
-        <a href="#skills" class="hover:text-indigo-400">Skills</a>
-        <a href="#contact" class="hover:text-indigo-400">Contact</a>
-        <button id="theme-toggle" aria-label="Toggle theme" title="Toggle dark / light">🌙</button>
+      <div class="space-x-4 text-sm" id="main-nav" style="color:var(--text-dim)">
+        <a href="#projects" class="hover:text-teal-300 nav-link">Projects</a>
+        <a href="#experience" class="hover:text-teal-300 nav-link">Experience</a>
+        <a href="#skills" class="hover:text-teal-300 nav-link">Skills</a>
+        <a href="#contact" class="hover:text-teal-300 nav-link">Contact</a>
+        <a href="#" id="copy-email" class="hover:text-teal-300">Copy Email</a>
+        <button id="theme-toggle" aria-label="Toggle theme" title="Toggle dark / light" class="px-2 py-1 rounded border neon-btn" style="border-color:var(--border); color:inherit">🌙</button>
       </div>
     </nav>
   </header>
 
-  <!-- ===== MAIN CONTENT ===== -->
-  <main class="max-w-5xl mx-auto px-6 pb-20">
+  <!-- ===== MAIN ===== -->
+  <main class="max-w-5xl mx-auto px-6 pb-28">
 
-    <!-- ===== INTRO SECTION ===== -->
-    <section class="grid md:grid-cols-3 gap-8 items-center fade-in" style="animation-delay: 0.2s">
+    <!-- ===== INTRO ===== -->
+    <section class="grid md:grid-cols-3 gap-8 items-center fade-in" data-animate style="animation-delay:.1s">
       <div class="md:col-span-2" id="intro">
-        <h2 class="text-4xl font-bold leading-tight">Salesforce Developer + AI Tinkerer</h2>
-        <p class="mt-4 text-gray-300">
-          I’m a Salesforce Developer skilled in Apex, LWC, Flow Builder, and AI integrations.
-          Passionate about building intelligent automations, assistants, and seamless business solutions.
+        <h2 class="relative text-4xl font-bold leading-tight grad-text overflow-hidden animate-title">
+          <span class="block">Software Developer</span>
+          <span class="shine"></span>
+        </h2>
+
+        <p class="mt-2 text-sm subtitle-fixed" id="animated-subtitle" style="color:#7ef3f1"></p>
+
+        <p class="mt-4 animate-paragraph" style="color:var(--text-base)">
+          I am a Salesforce Developer focused on building intelligent automations and seamless, AI-driven solutions. My expertise lies in leveraging the full power of the platform, combining custom Apex logic, modern LWC interfaces, and sophisticated Flow Builder automations. I am passionate about pushing the boundaries of Salesforce, particularly with AI integrations, to create smart assistants and systems that solve real-world business challenges.
         </p>
 
-        <div class="mt-6 flex flex-wrap gap-3">
-          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=aryaan375@gmail.com&su=Contact%20from%20Portfolio&body=Hi%20Aryaman%2C%0AI%20wanted%20to%20connect%20regarding..."
-         target="_blank"
-          rel="noopener noreferrer"
-         class="px-4 py-2 bg-indigo-600 rounded-md text-sm font-medium hover:bg-indigo-500 transition">
-         📧 Email Me
-        </a>
-          <a href="https://www.linkedin.com/in/aryaman-mohanty-053a041b1" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-gray-700 rounded-md text-sm text-gray-200 hover:border-indigo-500 hover:text-indigo-400 transition">💼 LinkedIn</a>
-          <a href="http://github.com/MAryaman03" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-gray-700 rounded-md text-sm text-gray-200 hover:border-indigo-500 hover:text-indigo-400 transition">🐙 GitHub</a>
-          <a href="https://www.salesforce.com/trailblazer/maryaman2224" target="_blank" rel="noopener noreferrer" class="px-4 py-2 border border-gray-700 rounded-md text-sm text-gray-200 hover:border-indigo-500 hover:text-indigo-400 transition">🌟 Trailhead</a>
-          <a href="https://drive.google.com/file/d/1fCccTjDpIuT5GXT-gLz8uA0FEorEAWQG/view?usp=sharing" target="_blank" class="px-4 py-2 border border-gray-700 rounded-md text-sm text-gray-200 hover:border-indigo-500 hover:text-indigo-400 transition">📄 Resume</a>
-        </div>
-
-        <div class="mt-8 grid grid-cols-2 gap-4">
-          <div class="p-4 bg-gray-800 rounded-lg">
-            <h4 class="text-sm text-gray-300">Location</h4>
-            <p class="font-medium">Hyderabad, Telangana, India</p>
-          </div>
-          <div class="p-4 bg-gray-800 rounded-lg">
-            <h4 class="text-sm text-gray-300">Certifications</h4>
-            <p class="font-medium">Salesforce Certified Developer (Trailhead)</p>
-          </div>
+        <div class="mt-6 flex flex-wrap gap-3 animate-buttons">
+          <a href="mailto:aryaan375@gmail.com" class="px-4 py-2 rounded-md text-sm font-medium transition neon-btn" style="background:var(--teal); color:#062c2a">📧 Email Me</a>
+          <a href="https://www.linkedin.com/in/aryaman-mohanty-053a041b1" target="_blank" class="px-4 py-2 rounded-md text-sm transition neon-btn border" style="border-color:var(--border); color:var(--text-base)">💼 LinkedIn</a>
+          <a href="http://github.com/MAryaman03" target="_blank" class="px-4 py-2 rounded-md text-sm transition neon-btn border" style="border-color:var(--border); color:var(--text-base)">🐙 GitHub</a>
+          <a href="https://www.salesforce.com/trailblazer/maryaman2224" target="_blank" class="px-4 py-2 rounded-md text-sm transition neon-btn border" style="border-color:var(--border); color:var(--text-base)">🌟 Trailhead</a>
+          <!-- View Resume (embedded modal) -->
+          <button id="download-resume" class="px-4 py-2 rounded-md text-sm font-medium transition neon-btn flex items-center gap-2" style="background:#0ea5e9; color:#06222b">
+            <span class="inline-block" id="dl-icon">⬇️</span><span>View Resume</span>
+          </button>
         </div>
       </div>
 
-      <div class="bg-gradient-to-br from-gray-800 to-gray-700 p-6 rounded-xl text-center profile-img">
-        <div class="w-48 h-48 mx-auto rounded-full overflow-hidden shadow-lg border-4 border-indigo-600">
-          <img src="https://lh3.googleusercontent.com/d/1_gtPR7UOVCcrZGqUMW-81eXsY4xkqH_K=s600" alt="Aryaman Mohanty" class="w-full h-full object-cover">
-        </div>
-        <div class="mt-4 text-sm text-gray-300">
-          <p><strong>📞 Phone:</strong> +91 9337146639</p>
-          <p class="mt-2"><strong>📧 Email:</strong> aryaan375@gmail.com</p>
-          <p class="mt-2"><strong>💼 LinkedIn:</strong> <a href="https://www.linkedin.com/in/aryaman-mohanty-053a041b1" target="_blank" class="underline text-indigo-400 hover:text-indigo-300">View Profile</a></p>
-          <p class="mt-2"><strong>🌟 Trailhead:</strong> <a href="https://www.salesforce.com/trailblazer/maryaman2224" target="_blank" class="underline text-indigo-400 hover:text-indigo-300">View Profile</a></p>
+      <div class="gradient-border p-[2px] rounded-xl profile-img">
+        <div class="p-6 rounded-xl text-center h-full" style="background: linear-gradient(180deg, var(--card), var(--card-2));">
+          <div class="w-48 h-48 mx-auto rounded-full overflow-hidden shadow-lg ring-4" style="--ring: rgba(20,184,166,0.7); box-shadow:0 0 0 4px var(--ring)">
+            <img src="https://lh3.googleusercontent.com/d/1_gtPR7UOVCcrZGqUMW-81eXsY4xkqH_K=s600" alt="Aryaman Mohanty" loading="lazy" class="w-full h-full object-cover">
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ===== EXPERIENCE SECTION ===== -->
-    <section id="experience" class="mt-16 fade-in" style="animation-delay: 0.3s">
-      <h3 class="text-2xl font-semibold">Experience</h3>
+    <!-- ===== EXPERIENCE ===== -->
+    <section id="experience" class="mt-16 fade-in" data-animate style="animation-delay:.15s">
+      <h3 class="text-2xl font-semibold">Experience & Education</h3>
       <div class="mt-6 grid md:grid-cols-2 gap-6">
-        <div class="p-6 bg-gray-800 rounded-lg card-hover">
-          <h4 class="text-lg font-medium">Salesforce Developer Intern — Neevas </h4>
-          <p class="text-sm text-gray-400">Aug 2024 — Aug 2024</p>
-          <ul class="mt-3 list-disc list-inside text-gray-300 space-y-1">
-            <li>Customized Salesforce features using Flow Builder, Apex, and LWC.</li>
-            <li>Built reports, dashboards, and managed user access.</li>
-            <li>Worked on API integrations and Trailhead-based projects.</li>
-          </ul>
+        <!-- Experience -->
+        <div class="p-6 rounded-lg card-hover timeline h-full flex flex-col">
+          <div class="timeline-item">
+            <span class="timeline-bullet"></span>
+            <h4 class="text-lg font-medium">Salesforce Developer Intern — Neevas</h4>
+            <p class="text-sm" style="color:var(--text-dim)">Aug 2024 — Aug 2024</p>
+            <ul class="mt-3 list-disc list-inside space-y-2" style="color:var(--text-base)">
+              <li>Customized Salesforce with <strong>Flow Builder</strong>, <strong>Apex</strong>, and <strong>LWC</strong> for scalable, maintainable solutions.</li>
+              <li>Built actionable <strong>reports & dashboards</strong>, optimized sharing rules, and managed data access.</li>
+              <li>Developed <strong>REST API</strong> integrations and contributed to Trailhead-based innovation projects.</li>
+            </ul>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="skill-tag">Apex</span>
+              <span class="skill-tag">LWC</span>
+              <span class="skill-tag">Flow Builder</span>
+              <span class="skill-tag">REST APIs</span>
+            </div>
+          </div>
         </div>
 
-        <div class="p-6 bg-gray-800 rounded-lg card-hover">
-          <h4 class="text-lg font-medium">Education</h4>
-          <p class="text-sm text-gray-400 mt-1">B.Tech — </p>
-          <p class="text-sm text-gray-300 mt-1">Trident Academy of Technology [2023 – 2026]</p>
-          <p class="text-sm text-gray-400 mt-1">Diploma — </p>
-          <p class="text-sm text-gray-300 mt-1">Aryan Institute of Engineering & Technology [2019 – 2022]</p>
-          <p class="text-sm text-gray-400 mt-1">High School —</p>
-          <p class="text-sm text-gray-300 mt-1">St. Xavier High School</p>
+        <!-- Education -->
+        <div class="p-6 rounded-lg card-hover h-full flex flex-col">
+          <h4 class="text-lg font-medium mb-4">Education</h4>
+          <div class="space-y-4 flex-1">
+            <div class="flex items-start gap-3">
+              <span class="text-xl" style="color:#7ef3f1">🎓</span>
+              <div>
+                <p class="text-sm font-semibold" style="color:var(--text-base)">B.Tech — Trident Academy of Technology [2023 – 2026]</p>
+                <p class="text-xs mt-1" style="color:var(--text-dim)">Bachelor's in Computer Science & Engineering.</p>
+              </div>
+            </div>
+            <hr style="border-color:var(--border)"/>
+            <div class="flex items-start gap-3">
+              <span class="text-xl" style="color:#7ef3f1">💡</span>
+              <div>
+                <p class="text-sm font-semibold" style="color:var(--text-base)">Diploma — Aryan Institute of Engineering & Technology [2019 – 2022]</p>
+                <p class="text-xs mt-1" style="color:var(--text-dim)">Foundational engineering and applied technologies.</p>
+              </div>
+            </div>
+            <hr style="border-color:var(--border)"/>
+            <div class="flex items-start gap-3">
+              <span class="text-xl" style="color:#7ef3f1">🏫</span>
+              <div>
+                <p class="text-sm font-semibold" style="color:var(--text-base)">High School — St. Xavier High School</p>
+                <p class="text-xs mt-1" style="color:var(--text-dim)">Science & mathematics focus.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ===== PROJECTS SECTION ===== -->
-    <section id="projects" class="mt-16 fade-in" style="animation-delay: 0.4s">
+    <!-- ===== PROJECTS ===== -->
+    <section id="projects" class="mt-16 fade-in" data-animate style="animation-delay:.2s">
       <h3 class="text-2xl font-semibold">Key Projects</h3>
-      <div class="mt-6 grid md:grid-cols-2 gap-6">
-        <div onclick="window.open('https://github.com/MAryaman03/edith-ai','_blank')" class="p-6 bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg cursor-pointer card-hover">
-          <h4 class="text-lg font-semibold">Edith — AI Personal Assistant</h4>
-          <p class="text-sm text-gray-400 mt-1">Real-time voice assistant with bilingual support</p>
-          <p class="mt-3 text-gray-300 text-sm">AI-driven assistant with hotword activation, live audio, Google Search integration, LiveKit agents, and PC automation features.</p>
-          <div class="mt-4 flex flex-wrap gap-2">
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">Python</span>
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">Google Gemini API</span>
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">LiveKit</span>
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">Speech Recognition</span>
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">TTS</span>
+
+      <div class="mt-4 flex flex-wrap gap-2 text-xs">
+        <button class="px-3 py-1 rounded border neon-btn filter-btn" data-filter="all" style="border-color:var(--border)">All</button>
+        <button class="px-3 py-1 rounded border neon-btn filter-btn" data-filter="python" style="border-color:var(--border)">Python</button>
+        <button class="px-3 py-1 rounded border neon-btn filter-btn" data-filter="salesforce" style="border-color:var(--border)">Salesforce</button>
+        <button class="px-3 py-1 rounded border neon-btn filter-btn" data-filter="ai" style="border-color:var(--border)">AI</button>
+      </div>
+
+      <div class="mt-6 grid md:grid-cols-2 gap-6" id="project-grid">
+        <!-- Edith -->
+        <div data-tags="python ai" class="p-6 rounded-lg card-hover gradient-border project-card"
+             data-title="Edith — AI Personal Assistant"
+             data-desc="Real-time voice assistant with hotword activation, bilingual support, Google Search integration, LiveKit agents, and PC automation features."
+             data-git="https://github.com/MAryaman03/edith-ai"
+             data-live="https://github.com/MAryaman03/edith-ai">
+          <div class="p-4 rounded-lg" style="background: rgba(4,9,7,0.6); border:1px solid var(--border);">
+            <h4 class="text-lg font-semibold">Edith — AI Personal Assistant</h4>
+            <p class="text-sm" style="color:var(--text-dim); margin-top:.25rem">Real-time voice assistant with bilingual support</p>
+            <p class="mt-3 text-sm" style="color:var(--text-base)">AI-driven assistant with hotword activation, live audio, Google Search integration, LiveKit agents, and PC automation features.</p>
+            <p id="edith-stats" class="text-xs mt-1" style="color:var(--text-dim)"></p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="skill-tag">Python</span>
+              <span class="skill-tag">Google Gemini API</span>
+              <span class="skill-tag">LiveKit</span>
+            </div>
           </div>
         </div>
 
-        <div class="p-6 bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg cursor-pointer card-hover">
-          <h4 class="text-lg font-semibold">Salesforce Customizations & Flows</h4>
-          <p class="text-sm text-gray-400 mt-1">Apex, LWC, Flow Builder custom solutions</p>
-          <p class="mt-3 text-gray-300 text-sm">Developed declarative and programmatic Salesforce solutions — Apex controllers, LWC components, data migrations, reports & dashboards, and security models.</p>
-          <div class="mt-4 flex flex-wrap gap-2">
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">Apex</span>
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">LWC</span>
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">Flow Builder</span>
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">REST APIs</span>
-            <span class="text-xs px-2 py-1 bg-gray-800 rounded">Salesforce CRM</span>
+        <!-- Salesforce Customizations -->
+        <div data-tags="salesforce" class="p-6 rounded-lg card-hover gradient-border project-card"
+             data-title="Salesforce Customizations & Flows"
+             data-desc="Apex controllers, LWC components, data migrations, reports & dashboards, and security models."
+             data-git="https://github.com/MAryaman03"
+             data-live="https://mindful-narwhal-x8e3l-dev-ed.trailblaze.my.site.com/traveloomvforcesite/login?ec=302&startURL=%2Ftraveloom%2F">
+          <div class="p-4 rounded-lg" style="background: rgba(4,9,7,0.6); border:1px solid var(--border);">
+            <h4 class="text-lg font-semibold">Salesforce Customizations & Flows</h4>
+            <p class="text-sm" style="color:var(--text-dim); margin-top:.25rem">Apex, LWC, Flow Builder custom solutions</p>
+            <p class="mt-3 text-sm" style="color:var(--text-base)">Developed declarative and programmatic Salesforce solutions — Apex controllers, LWC components, data migrations, reports & dashboards, and security models.</p>
+            <a href="https://mindful-narwhal-x8e3l-dev-ed.trailblaze.my.site.com/traveloomvforcesite/login?ec=302&startURL=%2Ftraveloom%2F" target="_blank" class="mt-4 inline-block px-4 py-2 text-sm rounded neon-btn" style="background: var(--cyan); color:#06222b">🔗 Project Link</a>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="skill-tag">Apex</span>
+              <span class="skill-tag">LWC</span>
+              <span class="skill-tag">Flow Builder</span>
+              <span class="skill-tag">Security</span>
+            </div>
           </div>
-          <!-- Project Link Button -->
-         <div class="mt-5">
-         <a href="https://mindful-narwhal-x8e3l-dev-ed.trailblaze.my.site.com/traveloomvforcesite/login?ec=302&startURL=%2Ftraveloom%2F"
-         target="_blank"
-         class="inline-block px-4 py-2 bg-indigo-600 text-sm rounded hover:bg-indigo-500 transform hover:scale-105 transition duration-300 ease-in-out shadow-md hover:shadow-[0_0_15px_#6366f1] hover:animate-pulse">
-        🔗 Project Link
-       </a>
-      </div>
-
         </div>
       </div>
     </section>
 
-    <!-- ===== SKILLS SECTION ===== -->
-    <section id="skills" class="mt-16 fade-in" style="animation-delay: 0.5s">
+    <!-- ===== SKILLS ===== -->
+    <section id="skills" class="mt-16 fade-in" data-animate style="animation-delay:.25s">
       <h3 class="text-2xl font-semibold">Skills</h3>
       <div class="mt-4 grid md:grid-cols-3 gap-4">
-        <div class="p-4 bg-gray-800 rounded-lg card-hover">
-          <h5 class="text-sm text-gray-300">Programming</h5>
+        <div class="p-4 rounded-lg card-hover float-card">
+          <h5 class="text-sm" style="color:var(--text-dim)">Programming</h5>
           <div class="mt-3 flex flex-wrap gap-2">
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">Java</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">Python</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">JavaScript</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">HTML</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">CSS</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">SQL</span>
+            <span class="skill-tag">Java</span><span class="skill-tag">Python</span><span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">SQL</span>
           </div>
         </div>
-        <div class="p-4 bg-gray-800 rounded-lg card-hover">
-          <h5 class="text-sm text-gray-300">Salesforce</h5>
+        <div class="p-4 rounded-lg card-hover float-card">
+          <h5 class="text-sm" style="color:var(--text-dim)">Salesforce</h5>
           <div class="mt-3 flex flex-wrap gap-2">
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">Apex</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">LWC</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">Visualforce</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">App Builder</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">Flow Builder</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">Process Builder</span>
+            <span class="skill-tag">Apex</span><span class="skill-tag">LWC</span><span class="skill-tag">Visualforce</span>
+            <span class="skill-tag">App Builder</span><span class="skill-tag">Flow Builder</span><span class="skill-tag">Process Builder</span>
           </div>
         </div>
-        <div class="p-4 bg-gray-800 rounded-lg card-hover">
-          <h5 class="text-sm text-gray-300">Tools</h5>
+        <div class="p-4 rounded-lg card-hover float-card">
+          <h5 class="text-sm" style="color:var(--text-dim)">Tools</h5>
           <div class="mt-3 flex flex-wrap gap-2">
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">REST APIs</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">Jira</span>
-            <span class="text-xs px-2 py-1 bg-gray-700 rounded">Trailhead</span>
+            <span class="skill-tag">REST APIs</span><span class="skill-tag">Jira</span><span class="skill-tag">Trailhead</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===== CONTACT SECTION ===== -->
-    <section id="contact" class="mt-16 fade-in" style="animation-delay: 0.6s">
+    <!-- ===== CONTACT ===== -->
+    <section id="contact" class="mt-16 fade-in" data-animate style="animation-delay:.3s">
       <h3 class="text-2xl font-semibold">Contact</h3>
       <div class="mt-4 grid md:grid-cols-2 gap-6">
-        <div class="p-6 bg-gray-800 rounded-lg card-hover">
-          <p class="text-gray-300">Feel free to reach out for collaborations, job opportunities, or to chat about Salesforce and AI.</p>
-          <div class="mt-6 text-sm text-gray-300 space-y-2">
-            <p><strong>📞 Phone:</strong> +91 9337146639</p>
-            <p><strong>📧 Email:</strong> aryaan375@gmail.com</p>
-            <p><strong>💼 LinkedIn:</strong> 
-              <a href="https://www.linkedin.com/in/aryaman-mohanty-053a041b1" target="_blank" class="underline text-indigo-400 hover:text-indigo-300">View Profile</a>
-            </p>
-            <p><strong>🐙 GitHub:</strong> 
-              <a href="http://github.com/MAryaman03" target="_blank" class="underline text-indigo-400 hover:text-indigo-300">View Profile</a>
-            </p>
-            <p><strong>🌟 Trailhead:</strong> 
-              <a href="https://www.salesforce.com/trailblazer/maryaman2224" target="_blank" class="underline text-indigo-400 hover:text-indigo-300">View Profile</a>
-            </p>
+        <div class="p-6 rounded-lg card-hover">
+          <p style="color:var(--text-base)">Feel free to reach out for collaborations, job opportunities, or to chat about Tech.</p>
+          <div class="mt-6 text-sm space-y-2" style="color:var(--text-base)">
+            <p><strong>📞 Phone:</strong> <a href="https://wa.me/919337146639" class="underline" style="color:#7ef3f1">+91 9337146639 (WhatsApp)</a></p>
+            <p><strong>📧 Email:</strong> <a href="mailto:aryaan375@gmail.com" class="underline" style="color:#7ef3f1">aryaan375@gmail.com</a></p>
+            <p><strong>💼 LinkedIn:</strong> <a href="https://www.linkedin.com/in/aryaman-mohanty-053a041b1" target="_blank" class="underline" style="color:#7ef3f1">View Profile</a></p>
+            <p><strong>🐙 GitHub:</strong> <a href="http://github.com/MAryaman03" target="_blank" class="underline" style="color:#7ef3f1">View Profile</a></p>
+            <p><strong>🌟 Trailhead:</strong> <a href="https://www.salesforce.com/trailblazer/maryaman2224" target="_blank" class="underline" style="color:#7ef3f1">View Profile</a></p>
           </div>
         </div>
 
-        <form action="https://formspree.io/f/xvgvzbek" method="POST" class="p-6 bg-gray-800 rounded-lg card-hover">
-          <label class="block text-sm text-gray-300">Your Name</label>
-          <input name="name" required class="mt-1 w-full rounded px-3 py-2 bg-gray-900 border border-gray-700 focus:border-indigo-500 focus:outline-none"/>
-
-          <label class="block text-sm text-gray-300 mt-4">Email</label>
-          <input name="email" type="email" required class="mt-1 w-full rounded px-3 py-2 bg-gray-900 border border-gray-700 focus:border-indigo-500 focus:outline-none"/>
-
-          <label class="block text-sm text-gray-300 mt-4">Message</label>
-          <textarea name="message" required class="mt-1 w-full rounded px-3 py-2 bg-gray-900 border border-gray-700 h-28 focus:border-indigo-500 focus:outline-none"></textarea>
-
-          <div class="mt-4 flex justify-end">
-            <button type="submit" class="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-500 transition">Send</button>
+        <form id="contact-form" action="https://formspree.io/f/xvgvzbek" method="POST" class="p-6 rounded-lg card-hover">
+          <label class="block text-sm" style="color:var(--text-dim)">Your Name</label>
+          <input name="name" required class="mt-1 w-full rounded px-3 py-2" style="background:#0b1210; border:1px solid var(--border); color:var(--text-base); outline:none"/>
+          <label class="block text-sm mt-4" style="color:var(--text-dim)">Email</label>
+          <input name="email" type="email" required class="mt-1 w-full rounded px-3 py-2" style="background:#0b1210; border:1px solid var(--border); color:var(--text-base); outline:none"/>
+          <label class="block text-sm mt-4" style="color:var(--text-dim)">Message</label>
+          <textarea name="message" required class="mt-1 w-full rounded px-3 py-2 h-28" style="background:#0b1210; border:1px solid var(--border); color:var(--text-base); outline:none"></textarea>
+          <div class="mt-4 flex items-center justify-between gap-2">
+            <button type="submit" class="px-4 py-2 rounded neon-btn" style="background:var(--teal); color:#062c2a">Send</button>
+            <a href="https://wa.me/919337146639" class="px-4 py-2 rounded neon-btn" style="background:var(--cyan); color:#06222b">WhatsApp</a>
           </div>
         </form>
       </div>
     </section>
 
-    <footer class="mt-16 text-center text-gray-500 text-sm fade-in" style="animation-delay: 0.7s">
+    <footer class="mt-16 text-center text-sm fade-in" data-animate style="animation-delay:.35s; color:var(--text-dim)">
       © 2025 Aryaman Mohanty 🌟
     </footer>
   </main>
-   
+
+  <!-- Sticky UI -->
+  <button id="scrollTop" class="scroll-top" aria-label="Back to top">↑</button>
+
+  <!-- Ask Wave AI -->
+  <button id="chatFab" class="chat-fab" aria-label="Chat with Wave AI">💬</button>
+  <div id="chatPanel" class="chat-panel">
+    <div class="flex items-center justify-between mb-2">
+      <div class="font-semibold">Ask Wave AI</div>
+      <button id="closeChat" class="text-sm" style="opacity:.7">✖</button>
+    </div>
+    <form id="chatForm" class="space-y-2">
+      <input type="hidden" name="source" value="chat-widget"/>
+      <input name="name" placeholder="Your name" required class="w-full rounded px-3 py-2" style="background:#0b1210; border:1px solid var(--border); color:var(--text-base)"/>
+      <textarea name="message" placeholder="Ask about my skills, projects, experience..." required class="w-full rounded px-3 py-2 h-24" style="background:#0b1210; border:1px solid var(--border); color:var(--text-base)"></textarea>
+      <button class="w-full px-4 py-2 rounded neon-btn" style="background:var(--teal); color:#062c2a">Ask</button>
+      <div id="chatReplies" class="space-y-2 text-sm"></div>
+      <p class="text-[11px]" style="color:var(--text-dim)">Powered by Hugging Face Inference API</p>
+    </form>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">Message sent ✅</div>
+
+  <!-- ===== MODALS ===== -->
+  <!-- Project Details Modal -->
+  <div id="projectModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="modalTitle" class="font-semibold"></h4>
+        <span id="closeProjectModal" class="modal-close">✖</span>
+      </div>
+      <p id="modalDesc" class="text-sm mt-2" style="color:var(--text-dim)"></p>
+      <div id="modalTech" class="flex flex-wrap gap-2 mt-4"></div>
+      <div class="mt-4 flex justify-end gap-2">
+        <a id="modalGit" href="#" target="_blank" class="px-3 py-2 rounded neon-btn" style="background:var(--teal); color:#062c2a;">GitHub</a>
+        <a id="modalLive" href="#" target="_blank" class="px-3 py-2 rounded neon-btn" style="background:var(--cyan); color:#06222b;">Live Demo</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resume Modal -->
+  <div id="resumeModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="font-semibold">My Resume</h4>
+        <span id="closeResume" class="modal-close">✖</span>
+      </div>
+      <iframe src="https://drive.google.com/file/d/1fCccTjDpIuT5GXT-gLz8uA0FEorEAWQG/preview" allow="autoplay"></iframe>
+    </div>
+  </div>
+
   <!-- ===== SCRIPTS ===== -->
   <script>
   (function () {
-    // ===== Typing Animation =====
+    /* ===== Header role typewriter ===== */
     const typingSpan = document.getElementById('typing-span');
-    const roles = ["Salesforce Developer", "Apex Specialist", "LWC Builder", "AI Integrator", "Automation Enthusiast"];
-    let roleIndex = 0, charIndex = 0, direction = 1, lastTick = 0, pauseUntil = 0;
-    const TYPING_SPEED = 45, PAUSE_AFTER = 900;
-
-    function typingLoop(timestamp) {
-      if (!typingSpan) return;
-      if (!lastTick) lastTick = timestamp;
-      const elapsed = timestamp - lastTick;
-      if (pauseUntil > timestamp) { requestAnimationFrame(typingLoop); return; }
-      if (elapsed >= TYPING_SPEED) {
-        lastTick = timestamp;
-        const current = roles[roleIndex];
+    const roles = ["Salesforce Developer","Apex Specialist","LWC Builder","AI Integrator","Automation Enthusiast"];
+    let roleIndex=0, charIndex=0, direction=1, lastTick=0, pauseUntil=0;
+    const TYPING_SPEED=40, PAUSE_AFTER=700;
+    function typingLoop(ts){
+      if(!typingSpan) return;
+      if(!lastTick) lastTick=ts;
+      const elapsed = ts-lastTick;
+      if(pauseUntil>ts){ return requestAnimationFrame(typingLoop); }
+      if(elapsed>=TYPING_SPEED){
+        lastTick=ts;
+        const current=roles[roleIndex];
         charIndex += direction;
-        if (charIndex >= current.length) { charIndex = current.length; direction = -1; pauseUntil = timestamp + PAUSE_AFTER; }
-        else if (charIndex <= 0) { charIndex = 0; direction = 1; roleIndex = (roleIndex + 1) % roles.length; pauseUntil = timestamp + 200; }
-        typingSpan.textContent = current.slice(0, charIndex);
+        if(charIndex>=current.length){ charIndex=current.length; direction=-1; pauseUntil=ts+PAUSE_AFTER; }
+        else if(charIndex<=0){ charIndex=0; direction=1; roleIndex=(roleIndex+1)%roles.length; pauseUntil=ts+180; }
+        typingSpan.textContent=current.slice(0,charIndex);
       }
       requestAnimationFrame(typingLoop);
     }
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(typingLoop));
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(typingLoop));
     else requestAnimationFrame(typingLoop);
 
-    // ===== Theme Toggle =====
+    /* ===== Intro subtitle typewriter ===== */
+    const subtitle = document.getElementById("animated-subtitle");
+    const subtitleLines = [
+      "Shaping LWC experiences users love.",
+      "Designing seamless AI-driven solutions.",
+      "Turning automation into art."
+    ];
+    let lineIndex=0, subIndex=0, deleting=false;
+    function typeSubtitle(){
+      const current = subtitleLines[lineIndex];
+      subtitle.textContent = current.substring(0, subIndex);
+      const speed = deleting ? 28 : 34;
+      if(!deleting && subIndex < current.length) subIndex++;
+      else if(deleting && subIndex>0) subIndex--;
+      else{
+        deleting = !deleting;
+        if(!deleting) lineIndex=(lineIndex+1)%subtitleLines.length;
+        setTimeout(typeSubtitle, deleting?650:240);
+        return;
+      }
+      setTimeout(typeSubtitle, speed);
+    }
+    document.addEventListener("DOMContentLoaded", typeSubtitle);
+
+    /* ===== Theme handling ===== */
     const themeBtn = document.getElementById('theme-toggle');
     const body = document.body;
     const stored = localStorage.getItem('theme');
     const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-    if (stored === 'light' || (!stored && prefersLight)) { body.classList.add('light-mode'); if (themeBtn) themeBtn.textContent = '☀️'; }
-    else { if (themeBtn) themeBtn.textContent = '🌙'; }
-    if (themeBtn) themeBtn.addEventListener('click', () => {
-      const isLight = body.classList.toggle('light-mode');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+
+    let particleColor = getComputedStyle(document.documentElement).getPropertyValue('--particle-color-dark');
+
+    function applyTheme(isLight){
+      body.classList.toggle('light-mode', isLight);
       themeBtn.textContent = isLight ? '☀️' : '🌙';
+      const root = getComputedStyle(document.documentElement);
+      particleColor = isLight ? root.getPropertyValue('--particle-color-light')
+                              : root.getPropertyValue('--particle-color-dark');
+      document.querySelectorAll('.float-icons span').forEach(s=>{ s.style.opacity = isLight ? 0.14 : 0.18; });
+    }
+    const initIsLight = stored === 'light' || (!stored && prefersLight);
+    applyTheme(initIsLight);
+    themeBtn && themeBtn.addEventListener('click', ()=>{
+      const isLight = !body.classList.contains('light-mode');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      applyTheme(isLight);
     });
 
-    // ===== Fade-in Observer =====
-    const fadeEls = document.querySelectorAll('.fade-in');
-    if (fadeEls.length) {
-      const io = new IntersectionObserver((entries, obs) => {
-        entries.forEach(e => { if (e.isIntersecting) { e.target.style.animationPlayState='running'; obs.unobserve(e.target); } });
-      }, { threshold: 0.1 });
-      fadeEls.forEach(el => { el.style.animationPlayState='paused'; io.observe(el); });
-    }
-
-    // ===== Particle Background =====
-    const canvas = document.getElementById('particle-canvas');
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      let particles = [], particleCount = window.innerWidth < 768 ? 30 : 80;
-
-      function initParticles() {
-        particles = Array.from({length: particleCount}, () => ({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          r: Math.random() * 2 + 1,
-          dx: (Math.random() - 0.5) * 0.3,
-          dy: (Math.random() - 0.5) * 0.3
-        }));
-      }
-
-      function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; particleCount = window.innerWidth < 768 ? 30 : 80; initParticles(); }
-      window.addEventListener('resize', resizeCanvas);
-      resizeCanvas();
-
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-          p.x += p.dx; p.y += p.dy;
-          if (p.x<0||p.x>canvas.width) p.dx*=-1;
-          if (p.y<0||p.y>canvas.height) p.dy*=-1;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fillStyle = 'rgba(255,255,255,0.2)';
-          ctx.fill();
+    /* ===== Section fade-in once & nav highlight ===== */
+    const fadeEls = document.querySelectorAll('[data-animate]');
+    if(fadeEls.length){
+      const io = new IntersectionObserver((entries, obs)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){ e.target.style.animationPlayState='running'; obs.unobserve(e.target); }
         });
-        requestAnimationFrame(animate);
-      }
-      animate();
+      },{threshold:0.1});
+      fadeEls.forEach(el=>{ el.style.animationPlayState='paused'; io.observe(el); });
     }
+
+    const sections=['projects','experience','skills','contact'];
+    const navLinks = Array.from(document.querySelectorAll('#main-nav .nav-link'));
+    const sectionObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          navLinks.forEach(a=>a.classList.remove('active'));
+          const active = document.querySelector(`#main-nav a[href="#${entry.target.id}"]`);
+          if(active) active.classList.add('active');
+        }
+      });
+    },{ rootMargin:'-40% 0px -55% 0px', threshold:0.01 });
+    sections.forEach(id=>{ const el=document.getElementById(id); if(el) sectionObserver.observe(el); });
+
+    /* ===== Scroll-to-top ===== */
+    const scrollTopBtn=document.getElementById('scrollTop');
+    window.addEventListener('scroll', ()=>{ if(window.scrollY>300) scrollTopBtn.classList.add('show'); else scrollTopBtn.classList.remove('show'); });
+    scrollTopBtn.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+    /* ===== Copy email & toasts ===== */
+    const copyBtn=document.getElementById('copy-email');
+    const toast=document.getElementById('toast');
+    function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1500); }
+    copyBtn && copyBtn.addEventListener('click',(e)=>{ e.preventDefault(); navigator.clipboard.writeText('aryaan375@gmail.com'); showToast('Email copied 📋'); });
+
+    /* ===== Project filters ===== */
+    const grid=document.getElementById('project-grid');
+    document.querySelectorAll('.filter-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const f=btn.dataset.filter;
+        grid.querySelectorAll('[data-tags]').forEach(card=>{
+          const tags=card.getAttribute('data-tags');
+          card.style.display = (f==='all' || tags.includes(f)) ? '' : 'none';
+        });
+      });
+    });
+
+    /* ===== Resume Modal ===== */
+    const dlBtn=document.getElementById('download-resume');
+    const dlIcon=document.getElementById('dl-icon');
+    const resumeModal=document.getElementById('resumeModal');
+    const closeResume=document.getElementById('closeResume');
+    dlBtn && dlBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      dlBtn.disabled=true; dlIcon.textContent='⏳';
+      setTimeout(()=>{ resumeModal.style.display='flex'; dlIcon.textContent='✅'; setTimeout(()=>{ dlIcon.textContent='⬇️'; dlBtn.disabled=false; }, 900); }, 400);
+    });
+    closeResume && closeResume.addEventListener('click', ()=> resumeModal.style.display='none');
+    window.addEventListener('click', (e)=>{ if(e.target===resumeModal) resumeModal.style.display='none'; });
+
+    /* ===== 3D Tilt ===== */
+    if(window.VanillaTilt){
+      VanillaTilt.init(document.querySelectorAll(".card-hover"), { max:12, speed:400, glare:true, "max-glare":0.2 });
+    }
+
+    /* ===== Project Modal ===== */
+    const projectModal = document.getElementById('projectModal');
+    const closeProjectModal = document.getElementById('closeProjectModal');
+    const mTitle = document.getElementById('modalTitle');
+    const mDesc  = document.getElementById('modalDesc');
+    const mTech  = document.getElementById('modalTech');
+    const mGit   = document.getElementById('modalGit');
+    const mLive  = document.getElementById('modalLive');
+
+    document.querySelectorAll('.project-card').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        mTitle.textContent = card.dataset.title || card.querySelector('h4')?.innerText || "Project";
+        mDesc.textContent  = card.dataset.desc  || card.querySelector('p:nth-of-type(2)')?.innerText || "";
+        mTech.innerHTML    = card.querySelector('.mt-4')?.innerHTML || "";
+        mGit.href          = card.dataset.git  || '#';
+        mLive.href         = card.dataset.live || '#';
+        projectModal.style.display='flex';
+      });
+    });
+    closeProjectModal && closeProjectModal.addEventListener('click',()=> projectModal.style.display='none');
+    window.addEventListener('click',(e)=>{ if(e.target===projectModal) projectModal.style.display='none'; });
+
+    /* ===== GitHub Stats (Edith) ===== */
+    fetch("https://api.github.com/repos/MAryaman03/edith-ai")
+      .then(r=>r.ok ? r.json() : Promise.reject())
+      .then(d=>{
+        const el=document.getElementById('edith-stats');
+        if(el){ el.textContent = `⭐ ${d.stargazers_count ?? 0}  •  🍴 ${d.forks_count ?? 0}  •  Updated ${new Date(d.updated_at).toLocaleDateString()}`; }
+      }).catch(()=>{});
+
+    /* ===== Contact Form: loader + minimal validation ===== */
+    const contactForm = document.getElementById('contact-form');
+    contactForm.addEventListener('submit', e=>{
+      const btn = contactForm.querySelector('button[type="submit"]');
+      btn.innerHTML = `<span class="loading-spinner"></span> Sending...`;
+      setTimeout(()=>{ btn.textContent = "Send"; }, 2000);
+    });
+
+    /* ===== Chat widget toggle ===== */
+    const chatFab=document.getElementById('chatFab');
+    const chatPanel=document.getElementById('chatPanel');
+    const closeChat=document.getElementById('closeChat');
+    const chatForm=document.getElementById('chatForm');
+    const chatReplies=document.getElementById('chatReplies');
+
+    chatFab.addEventListener('click', ()=> {
+      chatPanel.style.display = chatPanel.style.display==='block' ? 'none' : 'block';
+    });
+    closeChat.addEventListener('click', ()=> chatPanel.style.display='none');
+
+    /* ===== Ask Wave AI (Direct Hugging Face API) =====
+       IMPORTANT: Your token is visible with this approach (not secure for public).
+    */
+    const HF_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+    const HF_TOKEN   = "hf_PUT_YOUR_TOKEN_HERE"; // <-- paste your token here
+
+    function addReply(content, mine=false){
+      const b = document.createElement('div');
+      b.className = 'rounded-md px-3 py-2';
+      b.style.background = mine ? 'rgba(20,184,166,.1)' : 'rgba(14,165,233,.08)';
+      b.style.border = '1px solid var(--border)';
+      b.textContent = content;
+      chatReplies.appendChild(b);
+      chatReplies.scrollTop = chatReplies.scrollHeight;
+    }
+
+    // quick offline check when chat opens
+    chatFab.addEventListener('click', async ()=>{
+      const offlineMsg = "⚙️ Online AI unavailable. You can still use the contact form!";
+      try {
+        const res = await Promise.race([
+          fetch(HF_API_URL, { method: "OPTIONS" }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 2000))
+        ]);
+        if (!res.ok) addReply(offlineMsg);
+      } catch {
+        addReply(offlineMsg);
+      }
+    });
+
+    chatForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const name = chatForm.name.value.trim();
+      const msg  = chatForm.message.value.trim();
+      if(!msg) return;
+
+      addReply(`${name || "You"}: ${msg}`, true);
+      chatForm.message.value = "";
+      addReply("🤖 Thinking...");
+
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 6000));
+
+      try{
+        const prompt = `You are Wave AI — Aryaman’s portfolio assistant. Be concise and friendly.
+If asked about projects, use: Edith AI assistant (Python + Gemini + LiveKit), Salesforce customizations (Apex, LWC, Flows).
+Skills: Apex, LWC, Flow Builder, REST APIs, Python, Java, JS.
+User question: "${msg}"`;
+
+        const res = await Promise.race([
+          fetch(HF_API_URL, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${HF_TOKEN}`,
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 180, temperature: 0.6 } })
+          }),
+          timeout
+        ]);
+
+        if(!res.ok) throw new Error("network");
+        const data = await res.json();
+
+        let out = "";
+        if(Array.isArray(data) && data[0]?.generated_text){
+          out = data[0].generated_text.replace(prompt, "").trim();
+        } else if(data?.generated_text){
+          out = data.generated_text.trim();
+        } else if(typeof data === "string"){
+          out = data.trim();
+        } else {
+          out = "I’m here! Ask me about my projects, skills, or experience.";
+        }
+
+        chatReplies.lastChild.textContent = "🤖 " + out;
+      }catch(err){
+        chatReplies.lastChild.textContent = "⚙️ Online AI unavailable. You can still use the contact form!";
+      }
+    });
+
+    /* ===== Particle background (simple) ===== */
+    const pCanvas=document.getElementById('particle-canvas');
+    const pCtx=pCanvas.getContext('2d');
+    let particles=[], particleCount = window.innerWidth < 768 ? 36 : 96;
+    function resizeParticles(){ pCanvas.width=innerWidth; pCanvas.height=innerHeight; initParticles(); }
+    function initParticles(){
+      particles = Array.from({length: particleCount}, ()=>({ x: Math.random()*pCanvas.width, y: Math.random()*pCanvas.height, r: Math.random()*2+1, dx:(Math.random()-.5)*0.3, dy:(Math.random()-.5)*0.3 }));
+    }
+    function drawParticles(){
+      pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+      particles.forEach(p=>{
+        p.x+=p.dx; p.y+=p.dy;
+        if(p.x<0||p.x>pCanvas.width) p.dx*=-1;
+        if(p.y<0||p.y>pCanvas.height) p.dy*=-1;
+        pCtx.beginPath(); pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        pCtx.fillStyle = (getComputedStyle(document.documentElement).getPropertyValue('--particle-color-dark') || 'rgba(20,184,166,0.28)').trim();
+        pCtx.fill();
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    addEventListener('resize', resizeParticles); resizeParticles(); drawParticles();
+
+    /* ===== Cursor glow trail ===== */
+    const cCanvas=document.getElementById('cursor-canvas');
+    const cCtx=cCanvas.getContext('2d');
+    function resizeCursor(){ cCanvas.width=innerWidth; cCanvas.height=innerHeight; }
+    addEventListener('resize', resizeCursor); resizeCursor();
+    let points=[];
+    addEventListener('mousemove', (e)=>{ points.push({x:e.clientX, y:e.clientY, t:Date.now()}); });
+    function renderTrail(){
+      cCtx.clearRect(0,0,cCanvas.width,cCanvas.height);
+      const now=Date.now(); points=points.filter(p=> now-p.t<420);
+      points.forEach(p=>{
+        const age=(now-p.t)/420;
+        cCtx.beginPath();
+        cCtx.arc(p.x,p.y, 9*(1-age), 0, Math.PI*2);
+        cCtx.fillStyle=`rgba(${getComputedStyle(document.documentElement).getPropertyValue('--trail-rgb')},${0.22*(1-age)})`;
+        cCtx.fill();
+      });
+      requestAnimationFrame(renderTrail);
+    }
+    renderTrail();
   })();
   </script>
 </body>
