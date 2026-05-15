@@ -46,3 +46,4 @@ A premium, futuristic developer portfolio built with modern web technologies.
 - **Colors**: Edit `tailwind.config.js` `colors` object to change the primary and secondary accents.
 - **Data**: Update the arrays in `Skills.tsx`, `Experience.tsx`, `Projects.tsx`, and `Education.tsx` to modify your content.
 - **Typography**: Google Fonts (Inter and Outfit) are configured in `index.html` and `index.css`.
+# Portfolio
