@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Code2, Cpu, Layout, Server, Sparkles } from 'lucide-react';
+import { Code2, Cpu, Layout, Sparkles } from 'lucide-react';
 import Section from './Section';
 
 const highlights = [

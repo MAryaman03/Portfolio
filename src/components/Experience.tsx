@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion, useInView, useMotionValue, useSpring } from 'framer-motion';
 import Section from './Section';
-import { Briefcase, Calendar, TrendingUp } from 'lucide-react';
+import { Briefcase, Calendar } from 'lucide-react';
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);

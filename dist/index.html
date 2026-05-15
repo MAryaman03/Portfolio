@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aryaman Mohanty | Software Engineer</title>
+  <meta name="description"
+    content="Portfolio of Aryaman Mohanty, a Software Engineer, Salesforce Developer, and Full-Stack Developer building scalable software systems and enterprise-grade CRM solutions." />
+  <link rel="icon" type="image/png" href="/logoport.png" />
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-CjFK-DAj.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-dxENyjyh.css">
+</head>
+
+<body class="bg-background text-foreground antialiased select-none">
+  <div id="root"></div>
+  <script>
+    // Prevent right-click
+    document.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+    });
+
+    // Prevent copy, cut, and paste
+    document.addEventListener('copy', function (e) { e.preventDefault(); });
+    document.addEventListener('cut', function (e) { e.preventDefault(); });
+    document.addEventListener('paste', function (e) { e.preventDefault(); });
+
+    // Prevent common developer tools shortcuts
+    document.addEventListener('keydown', function (e) {
+      // F12
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+I / Cmd+Option+I (Inspector)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+J / Cmd+Option+J (Console)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
+        e.preventDefault();
+      }
+      // Ctrl+Shift+C / Cmd+Option+C (Element Inspector)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
+        e.preventDefault();
+      }
+      // Ctrl+U / Cmd+U (View Source)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u')) {
+        e.preventDefault();
+      }
+      // Ctrl+C / Cmd+C (Copy)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'C' || e.key === 'c') && !e.shiftKey) {
+        e.preventDefault();
+      }
+      // Ctrl+S / Cmd+S (Save Page)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+      }
+      // Ctrl+P / Cmd+P (Print Page)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'P' || e.key === 'p')) {
+        e.preventDefault();
+      }
+    });
+
+    // Clear console aggressively to prevent reading logs if somehow opened
+    setInterval(function () {
+      console.clear();
+    }, 1000);
+  </script>
+</body>
+
+</html>
