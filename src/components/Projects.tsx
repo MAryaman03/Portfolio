@@ -84,55 +84,57 @@ export default function Projects() {
   }, [selectedId]);
 
   return (
-    <Section id="projects" title="Featured Work" subtitle="Projects">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
-        {projects.map((project, idx) => (
-          <motion.div
-            key={project.id}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: idx * 0.1 }}
-            onClick={() => setSelectedId(project.id)}
-            className="glass-card rounded-2xl overflow-hidden group flex flex-col h-full cursor-pointer hover:border-primary/50 transition-colors shadow-lg hover:shadow-[0_0_30px_rgba(112,0,255,0.2)]"
-            whileHover={{ y: -5, scale: 1.02 }}
-          >
-            {/* Project Image */}
-            <div className="relative h-56 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-[#030014] to-primary/20 mix-blend-overlay z-10 group-hover:opacity-0 transition-opacity duration-500" />
-              <motion.img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-              />
-            </div>
-
-            {/* Content */}
-            <div className="p-6 flex flex-col flex-1 relative bg-gradient-to-b from-transparent to-[#030014]/50">
-              <motion.h3 className="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-secondary transition-colors">
-                {project.title}
-              </motion.h3>
-              <motion.p className="text-white/60 text-sm mb-4 relative z-10 line-clamp-2">
-                {project.description}
-              </motion.p>
-
-              {/* Tech Stack Badges */}
-              <div className="flex flex-wrap gap-2 mb-4 mt-auto relative z-10">
-                {project.tech.slice(0, 3).map(t => (
-                  <span key={t} className="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-1 bg-white/5 text-primary-light rounded-full border border-white/10 group-hover:border-primary/30 transition-colors">
-                    {t}
-                  </span>
-                ))}
-                {project.tech.length > 3 && (
-                  <span className="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-1 bg-white/5 text-white/50 rounded-full border border-white/10">
-                    +{project.tech.length - 3}
-                  </span>
-                )}
+    <>
+      <Section id="projects" title="Featured Work" subtitle="Projects">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
+          {projects.map((project, idx) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              onClick={() => setSelectedId(project.id)}
+              className="glass-card rounded-2xl overflow-hidden group flex flex-col h-full cursor-pointer hover:border-primary/50 transition-colors shadow-lg hover:shadow-[0_0_30px_rgba(112,0,255,0.2)]"
+              whileHover={{ y: -5, scale: 1.02 }}
+            >
+              {/* Project Image */}
+              <div className="relative h-56 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#030014] to-primary/20 mix-blend-overlay z-10 group-hover:opacity-0 transition-opacity duration-500" />
+                <motion.img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                />
               </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+
+              {/* Content */}
+              <div className="p-6 flex flex-col flex-1 relative bg-gradient-to-b from-transparent to-[#030014]/50">
+                <motion.h3 className="text-xl font-bold text-white mb-2 relative z-10 group-hover:text-secondary transition-colors">
+                  {project.title}
+                </motion.h3>
+                <motion.p className="text-white/60 text-sm mb-4 relative z-10 line-clamp-2">
+                  {project.description}
+                </motion.p>
+
+                {/* Tech Stack Badges */}
+                <div className="flex flex-wrap gap-2 mb-4 mt-auto relative z-10">
+                  {project.tech.slice(0, 3).map(t => (
+                    <span key={t} className="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-1 bg-white/5 text-primary-light rounded-full border border-white/10 group-hover:border-primary/30 transition-colors">
+                      {t}
+                    </span>
+                  ))}
+                  {project.tech.length > 3 && (
+                    <span className="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-1 bg-white/5 text-white/50 rounded-full border border-white/10">
+                      +{project.tech.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </Section>
 
       {/* Expandable Modal View */}
       <AnimatePresence>
@@ -237,6 +239,6 @@ export default function Projects() {
           </>
         )}
       </AnimatePresence>
-    </Section>
+    </>
   );
 }
